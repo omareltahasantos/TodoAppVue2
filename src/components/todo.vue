@@ -4,15 +4,15 @@
             <h1 class=" text-center todo ">#todo</h1>
             <div class="row pt-4 d-flex justify-content-center">
                 <div class="col-lg-2 offset-lg-1">
-                    <button class="btn allbtn" @click="mostrar('Todas')">All</button>
+                    <button class="btn allbtn" @change="show('all')" @click="show('all', '')" :class="{marker: all === true}" >All</button>
                 </div>
                 <div class="col-lg-2 offset-lg-1">
-                    <button class="btn activebtn" @click="mostrar('incompleta')">Active</button>
+                    <button class="btn activebtn" @change="show('active')" @click="show('active', false)"  :class="{marker: type === false}">Active</button>
                 </div>
                 <div class="col-lg-2 offset-lg-1">
                     <button 
                     class="btn completedbtn " 
-                    @click="mostrar('completa')">Completed</button>
+                    @change="show('completed')"   @click="show('completed', true)" :class="{marker: type === true }">Completed</button>
                 </div>
             </div>
             <div class="row pt-3">
@@ -33,10 +33,18 @@
             <div class="row pt-5">
                 <div class="col-lg-4 offset-lg-3" >
                     <ul v-for="task, index in tasks" :key="index">
-                        <li :class="{completed: task.completed}">
-                            <input type="checkbox"  :id="task.taskId" :value="task.text" v-model="checkbox" @click="check()" @change="check()" >
-                            Id: {{task.taskId}} Tarea: {{task.text}}
+                        <li :class="{completed: task.completed}" v-if="statusTask === 'all' ">
+                            <input type="checkbox"  :id="task.taskId" :value="task.taskId" v-model="checkbox" @click="check()" @change="check()" >
+                          Tarea: {{task.text}}
                         </li>
+                        <li :class="{completed: task.completed}" v-if="(statusTask === 'active') && (task.completed === false)">
+                            <input type="checkbox"  :id="task.taskId" :value="task.taskId" v-model="checkbox" @click="check()" @change="check()" >
+                           Tarea: {{task.text}}
+                        </li>
+                        <li  v-if="(statusTask === 'completed') && (task.completed === true) ">
+                          Tarea: {{task.text}}
+                        </li>
+                     
                     </ul>
                 </div>
             </div>
@@ -52,7 +60,11 @@
                 checkbox: [],
                 newTask: "",
                 tasks: [],
-                contador: 1
+                contador: 1,
+                statusTask: "all",
+                all: true, 
+                type: Boolean
+
             }
         },
         methods: {
@@ -62,7 +74,10 @@
                     text: this.newTask,
                     completed: false
                 }
-                 this.tasks.push(task)
+                if (this.newTask != "") {
+                    this.tasks.push(task)
+                     this.newTask = ""
+                }
             },
             check(e){
     
@@ -71,12 +86,28 @@
                    
                    for (let j = 0; j < this.checkbox.length; j++) {
                      
-                     if (this.checkbox[j] === this.tasks[i].text) {
+                     if (this.checkbox[j] === this.tasks[i].taskId) {
 
                         this.tasks[i].completed = !this.tasks[i].completed
                      }   
                    }
                 }
+            },
+            show(status, boolean){
+                this.statusTask = status;
+                console.log(this.statusTask)
+                
+                if (boolean === "") {
+                    this.all = true
+                    this.type= ""
+                }else if (boolean === false) {
+                    this.type = boolean
+                    this.all = false
+                }else if (boolean === true) {
+                    this.type = true
+                    this.all = false
+                }
+               return this.statusTask
             }
          }
         }
@@ -136,7 +167,6 @@ color: #000000;
 }
 
 .allbtn{
-      border-bottom:solid #2F80ED;
     background: none;
     font-family: Montserrat;
     font-style: normal;
@@ -150,7 +180,6 @@ color: #000000;
 }
 
 .activebtn{
-    border-bottom:solid #2F80ED;
     background: none;
     font-family: Montserrat;
     font-style: normal;
@@ -164,7 +193,7 @@ color: #000000;
 }
 
 .completedbtn{
-    border-bottom:solid #2F80ED;
+    
     background: none;
     font-family: Montserrat;
     font-style: normal;
@@ -175,6 +204,10 @@ color: #000000;
 
 
     color: #333333;
+}
+
+.marker{
+border-bottom:solid #2F80ED;    
 }
 
 </style>
