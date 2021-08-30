@@ -4,13 +4,15 @@
             <h1 class=" text-center todo ">#todo</h1>
             <div class="row pt-4 d-flex justify-content-center">
                 <div class="col-lg-2 offset-lg-1">
-                    <button class="btn allbtn" @click="mostrar()">All</button>
+                    <button class="btn allbtn" @click="mostrar('Todas')">All</button>
                 </div>
                 <div class="col-lg-2 offset-lg-1">
-                    <button class="btn activebtn" @click="mostrar('incompleted')">Active</button>
+                    <button class="btn activebtn" @click="mostrar('incompleta')">Active</button>
                 </div>
                 <div class="col-lg-2 offset-lg-1">
-                    <button class="btn completedbtn " @click="mostrar('completed')">Completed</button>
+                    <button 
+                    class="btn completedbtn " 
+                    @click="mostrar('completa')">Completed</button>
                 </div>
             </div>
             <div class="row pt-3">
@@ -29,9 +31,12 @@
             </div>
 
             <div class="row pt-5">
-                <div class="col-lg-4 offset-lg-3">
-                    <ul v-for="task,id in tasks" :key="id" class="tasksul">
-                        <li class="taskLi" >{{task.text}}</li>
+                <div class="col-lg-4 offset-lg-3" >
+                    <ul v-for="task, index in tasks" :key="index">
+                        <li :class="{completed: task.completed}">
+                            <input type="checkbox"  :id="task.taskId" :value="task.text" v-model="checkbox" @click="check()" @change="check()" >
+                            Id: {{task.taskId}} Tarea: {{task.text}}
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -44,32 +49,44 @@
     export default {
         data(){
             return{
-                checked: false,
+                checkbox: [],
                 newTask: "",
-                status: "incompleted",
                 tasks: [],
-               
+                contador: 1
             }
         },
         methods: {
             addTask() {
-
                 let task = {
+                    taskId: this.contador++,
                     text: this.newTask,
                     completed: false
                 }
                  this.tasks.push(task)
-
-                
             },
-            mostrar(newStatus){
-               return this.status = newStatus;
+            check(e){
+    
+
+                for (let i = 0; i < this.tasks.length; i++) {
+                   
+                   for (let j = 0; j < this.checkbox.length; j++) {
+                     
+                     if (this.checkbox[j] === this.tasks[i].text) {
+
+                        this.tasks[i].completed = !this.tasks[i].completed
+                     }   
+                   }
+                }
             }
-        },
-    }
+         }
+        }
 </script>
 
 <style scoped>
+.completed {
+  text-decoration: line-through;
+  color: grey;
+}
 #unCompletedTask{
             text-decoration:none;
 
